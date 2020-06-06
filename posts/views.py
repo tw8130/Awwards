@@ -3,6 +3,7 @@ from django.http  import HttpResponse, Http404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from .models import Project,Profile,Review
 from .forms import NewsLetterForm
+from .email import send_welcome_email
 
 # Create your views here.
 
@@ -10,6 +11,18 @@ from .forms import NewsLetterForm
 def welcome(request):
     all_projects = Project.fetch_all_images()
     form = NewsLetterForm()
+
+    if request.method == 'POST':
+        form = NewsLetterForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['your_name']
+            email = form.cleaned_data['email']
+
+            recipient = NewsLetterRecipients(name = name,email =email)
+            recipient.save()
+            send_welcome_email(name,email)
+
+            HttpResponseRedirect('index')
 
     return render(request, 'index.html',{"all_images":all_projects,"letterForm":form})
 
