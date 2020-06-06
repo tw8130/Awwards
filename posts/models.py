@@ -5,18 +5,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 # Create your models here.
 
-class Project(models.Model):
-    title = models.CharField(max_length=100)
-    description = HTMLField()
-    link = models.CharField(max_length=100)
-    user = models.ForeignKey(Profile,on_delete=models.CASCADE,related_name="project")
-    image = models.ImageField(upload_to='project_pics',blank=True)
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        ordering = ['-id']
-
 class Profile(models.Model):
     profile_picture = models.ImageField(upload_to='prof_pics/',blank=True)
     prof_user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="profile")
@@ -30,13 +18,40 @@ class Profile(models.Model):
     #create user
     @receiver(post_save, sender=User) 
     def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
+        if created:
+            Profile.objects.create(user=instance)
     
     #save user
     @receiver(post_save, sender=User) 
     def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+        instance.profile.save()
+
+class Project(models.Model):
+    title = models.CharField(max_length=100)
+    description = HTMLField()
+    link = models.CharField(max_length=100)
+    user = models.ForeignKey(Profile,on_delete=models.CASCADE,related_name="project")
+    image = models.ImageField(upload_to='project_pics',blank=True)
+
+    def average_design(self):
+        design_ratings = list(map(lambda x: x.design_rating, self.reviews.all()))
+        return np.mean(design_ratings)
+
+    def average_usability(self):
+        usability_ratings = list(map(lambda x: x.usability_rating, self.reviews.all()))
+        return np.mean(usability_ratings)
+
+    def average_content(self):
+        content_ratings = list(map(lambda x: x.content_rating, self.reviews.all()))
+        return np.mean(content_ratings)
+
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['-id']
+
 
 class Review(models.Model):
     RATING_CHOICES = (
