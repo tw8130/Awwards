@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Project,Profile,Review
 from .forms import NewsLetterForm
 from .email import send_welcome_email
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -12,19 +13,17 @@ def welcome(request):
     all_projects = Project.fetch_all_images()
     form = NewsLetterForm()
 
-    if request.method == 'POST':
-        form = NewsLetterForm(request.POST)
-        if form.is_valid():
-            name = form.cleaned_data['your_name']
-            email = form.cleaned_data['email']
-
-            recipient = NewsLetterRecipients(name = name,email =email)
-            recipient.save()
-            send_welcome_email(name,email)
-
-            HttpResponseRedirect('index')
-
     return render(request, 'index.html',{"all_images":all_projects,"letterForm":form})
+
+def newsletter(request):
+    name = request.POST.get('your_name')
+    email = request.POST.get('email')
+
+    recipient = NewsLetterRecipients(name=name, email=email)
+    recipient.save()
+    send_welcome_email(name, email)
+    data = {'success': 'You have been successfully added to mailing list'}
+    return JsonResponse(data)
 
 def search_project(request):
     if 'project' in request.GET and request.GET ["project"]:
@@ -68,8 +67,6 @@ def project(request, id):
 
     else:
         form = ReviewForm()
-
-        # return HttpResponseRedirect(reverse('image', args=(image.id,)))
 
     return render(request, 'image.html', {"project": project,
                                           'form':form,
