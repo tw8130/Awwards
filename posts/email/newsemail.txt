@@ -1,0 +1,4 @@
+Hello {{name}}
+
+Welcome to the Awwards Arena newsletter You will find the most exciting projects and their reviews by others.
+You can also review projects and submit your own projects to be reviewed.
