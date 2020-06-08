@@ -10,7 +10,8 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializer import ProjectSerializer,ProfileSerializer
-
+from rest_framework import status
+from .permissions import IsAdminOrReadOnly
 # Create your views here.
 def register(request):
     if request.method == 'POST':
@@ -154,6 +155,16 @@ class ProjectList(APIView):
         serializers = ProjectSerializer(all_projects, many = True)
         return Response(serializers.data)
 
+    def post(self, request, format=None):
+        serializers = ProjectSerializer(data=request.data)
+        permission_classes = (IsAdminOrReadOnly,)
+
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data, status= status.HTTP_201_CREATED)
+
+        return Response(serializers.errors, status = status.HTTP_400_BAD_REQUEST)
+
 # Profile Serializer
 
 class ProfileList(APIView):
@@ -161,3 +172,13 @@ class ProfileList(APIView):
         all_profiles = Profile.objects.all()
         serializers = ProfileSerializer(all_profiles, many = True)
         return Response(serializers.data)
+    
+    def post(self, request, format=None):
+        serializers = ProfileSerializer(data=request.data)
+        permission_classes = (IsAdminOrReadOnly,)
+
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data, status= status.HTTP_201_CREATED)
+
+        return Response(serializers.errors, status = status.HTTP_400_BAD_REQUEST)
