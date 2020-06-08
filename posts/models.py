@@ -15,7 +15,7 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'{self.user.username}.Profile'
-
+    
     #create user
     @receiver(post_save, sender=User) 
     def create_user_profile(sender, instance, created, **kwargs):
@@ -26,6 +26,13 @@ class Profile(models.Model):
     @receiver(post_save, sender=User) 
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
+    
+    def save_profile(self):
+        self.save()
+
+    def delete_profile(self):
+        self.delete()
+
 
 class Project(models.Model):
     title = models.CharField(max_length=100)
@@ -52,6 +59,39 @@ class Project(models.Model):
 
     class Meta:
         ordering = ['-id']
+    
+     def save_project(self):
+        self.save()
+
+    @classmethod
+    def fetch_all_images(cls):
+        all_images = Project.objects.all()
+        return all_images
+
+    @classmethod
+    def search_project_by_title(cls,search_term):
+        project = cls.objects.filter(title__icontains=search_term)
+        return project
+    
+    @classmethod
+    def delete_project_by_id(cls, id):
+        projects = cls.objects.filter(pk=id)
+        projects.delete()
+
+    @classmethod
+    def get_project_by_id(cls, id):
+        projects = cls.objects.get(pk=id)
+        return projects
+
+     @classmethod
+    def update_project(cls, id):
+        projects = cls.objects.filter(id=id).update(id=id)
+        return projects
+
+    @classmethod
+    def update_description(cls, id):
+        projects = cls.objects.filter(id=id).update(id=id)
+        return projects
 
 
 class Review(models.Model):
@@ -74,6 +114,13 @@ class Review(models.Model):
     design_rating = models.IntegerField(choices=RATING_CHOICES, default=0)
     usability_rating = models.IntegerField(choices=RATING_CHOICES, default=0)
     content_rating = models.IntegerField(choices=RATING_CHOICES, default=0)
+
+    def save_comment(self):
+        self.save()
+
+    def get_comment(self, id):
+        comments = Review.objects.filter(image_id =id)
+        return comments
 
     def __str__(self):
         return self.comment
