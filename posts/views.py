@@ -1,11 +1,15 @@
 from django.shortcuts import render,redirect
 from django.http  import HttpResponse, Http404, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .models import Project,Profile,Review
 from .forms import NewsLetterForm,RegistrationForm,ReviewForm,ProfileForm,ProjectForm
 from django.contrib import messages
 from .email import send_welcome_email
 from django.http import JsonResponse
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .serializer import ProjectSerializer,ProfileSerializer
 
 # Create your views here.
 def register(request):
@@ -22,7 +26,6 @@ def register(request):
     return render(request, 'users/register.html', {'form': form})
 
 
-
 @login_required(login_url='/accounts/login/')
 def welcome(request):
     all_projects = Project.fetch_all_images()
@@ -30,6 +33,7 @@ def welcome(request):
 
     return render(request, 'index.html',{"all_images":all_projects,"letterForm":form})
 
+#Ajax functionality
 def newsletter(request):
     name = request.POST.get('your_name')
     email = request.POST.get('email')
@@ -141,3 +145,19 @@ def new_project(request):
     else:
         form = ProjectForm()
     return render(request,"new_project.html",{"form":form})
+
+# Project Serializer
+
+class ProjectList(APIView):
+    def get(self, request, format = None):
+        all_projects = Project.objects.all()
+        serializers = ProjectSerializer(all_projects, many = True)
+        return Response(serializers.data)
+
+# Profile Serializer
+
+class ProfileList(APIView):
+    def get(self, request, format = None):
+        all_profiles = Profile.objects.all()
+        serializers = ProfileSerializer(all_profiles, many = True)
+        return Response(serializers.data)
