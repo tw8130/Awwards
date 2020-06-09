@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css?family=Charmonman|Dancing+Script|Kodchasan|Spirax|Abril+Fatface" rel="stylesheet">
+
+<div class="container-fluid">
+    <div class="jumbotron text-center mb-0" id="jumbo" style="background-color:white;">
+
+        <h1 class="h1" style="font-family: 'Dosis', cursive; color:blue;font-size:70px;">Awards</h1>
+        <p class="h1" style="font-family: 'Dosis', cursive; color:black;font-size:25px;">View projects, submit your own projects and have them reviewed.</p>
+      </div>
+
+        <div class="row">
+            {% for image in all_images%}
+    
+            <div class="col-md-4 main-page d-flex" style=" margin-top: 5px;">
+                <div class="card card-cascade wider flex-fill ">
+
+    
+                    <!-- Card image -->
+                    <div class="view view-cascade overlay">
+                        <a data-toggle="modal" data-target="#{{project.id}}"><img class="card-img-top"
+                                src="{{image.image.url}}" alt="{{image.title}}"></a>
+                    </div>
+                    <!--Card content-->
+                    <div class="card-body">
+    
+                        <!--Title-->
+                        <h4 class="card-title">{{image.title}}</h4>
+                        <!--Text-->
+                        <p class="card-text">{{image.description}}</p>
+                        <p><a href="{{ image.link}}">Visit Site</a></p>                    
+                        
+                        <a href="{% url 'project_review' %}" class="btn btn-INFO btn-md">Review Project</a>
+    
+                    </div>
+                </div>
+            </div>
+            <!--Modal: modalYT-->
+            <div class="modal fade" id="{{image.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">                               
+                            <div class="embed-responsive embed-responsive-16by9">
+                                <img class="embed-responsive-item" src="{{image.image.url}}" alt="Image Loading"
+                                    style="margin:10px;" allowfullscreen>
+                            </div>                              
+    
+                </div>
+            </div>
+            <!--Modal: modalYT-->
+            <div class="jumbotron text-center mt-3" style="background-color:white;font-family: 'Dosis', sans-serif;">
+
+                <form action="{%url 'index'%}" method="post">
+                  {%csrf_token%} {% bootstrap_form letterForm %}
+                  <input type="submit" style="background-color:white;" value="Subscribe To Awards ">
+                </form>
+              
+              </div>
+              <div class="container">
+                <div class="col-md-12">
+                  <div class="footer text-center">
+                    <ul id="footer1">
+                      <li>ABOUT US</li>
+                      <li>SUPPORT</li>
+                      <li>PRESS</li>
+                      <li>API</li>
+                      <li>JOBS</li>
+                      <li>PRIVACY</li>
+                      <li>TERMS</li>
+                      <li>DIRECTORY</li>
+                      <li>PROFILES</li>
+                      <li>HASHTAGS</li>
+                      <li>LANGUAGE</li>
+                      <br>
+              
+                      <li style="font-size:10px;"> <strong>© 2020 TABITHA WANJIKU</strong></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+        
+    
+            {% empty %}
+            <div class="row">
+                <h1 class="text-center"> No Projects Yet</h1>
+            </div>
+            {% endfor %}
+        </div>
+        <!-- Card deck -->
+        <div class="row">
+        </div>
+        
+    </div>
+{% endblock %}
+{% block scripts %} {{block.super}}
+  <script type="text/javascript" src="{%static 'js/newsletter.js'%}"></script>
+{% endblock %}
