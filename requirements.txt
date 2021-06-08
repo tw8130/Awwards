@@ -8,7 +8,7 @@ django-tinymce==3.0.2
 djangorestframework==3.11.0
 gunicorn==20.0.4
 numpy==1.8.2
-Pillow==7.1.2
+Pillow==8.2.0
 psycopg2==2.8.5
 python-decouple==3.3
 pytz==2020.1
